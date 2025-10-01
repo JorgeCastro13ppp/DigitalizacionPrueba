@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import shutil
 import subprocess
@@ -10,16 +11,27 @@ import argparse
 # ========================
 # CONFIGURACIÓN
 # ========================
-PROYECTOS_DIR = Path("/home/usuario/ProyectosDAM")  # Carpeta de proyectos
-DESTINO_NAS = Path("/mnt/nas/backup_proyectos")      # Carpeta de red/NAS
-REPOS_GITHUB = [PROYECTOS_DIR / "Proyecto1", PROYECTOS_DIR / "Proyecto2"]  # Repositorios locales
+# Carpeta base donde están tus proyectos
+PROYECTOS_BASE = Path("/home/diurno/Escritorio/DASP")
 
-LOG_FILE = "backup_avanzado.log"
-logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Carpeta destino NAS / red
+DESTINO_NAS = Path("/mnt/nas/backup_proyectos")  # Cambia según tu red
+
+# Log de actividad
+LOG_FILE = str(Path(__file__).parent / "backup.log")
+logging.basicConfig(filename=LOG_FILE, level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 # ========================
 # FUNCIONES AUXILIARES
 # ========================
+def encontrar_repos_git(base_path):
+    """Devuelve lista de subdirectorios que son repositorios Git"""
+    repositorios = []
+    for sub in base_path.iterdir():
+        if sub.is_dir() and (sub / ".git").exists():
+            repositorios.append(sub)
+    return repositorios
 
 def zip_folder(folder_path, zip_path):
     """Comprime toda la carpeta en un archivo zip"""
@@ -37,7 +49,7 @@ def backup_to_nas():
         logging.info(f"Se creó la carpeta destino: {DESTINO_NAS}")
 
     resumen = []
-    for proyecto in PROYECTOS_DIR.iterdir():
+    for proyecto in PROYECTOS_BASE.iterdir():
         if proyecto.is_dir():
             zip_name = f"{proyecto.name}_{datetime.now().strftime('%Y%m%d')}.zip"
             zip_path = DESTINO_NAS / zip_name
@@ -51,21 +63,26 @@ def backup_to_nas():
             resumen.append(zip_name)
     return resumen
 
-def backup_to_github():
+def backup_to_github(repositorios):
     """Hace git push automático de repositorios locales"""
     actualizado = []
-    for repo in REPOS_GITHUB:
-        if (repo / ".git").exists():
-            try:
-                subprocess.run(["git", "-C", str(repo), "add", "."], check=True)
-                subprocess.run(["git", "-C", str(repo), "commit", "-m", "Backup automático"], check=True)
+    for repo in repositorios:
+        try:
+            subprocess.run(["git", "-C", str(repo), "add", "."], check=True)
+            # Evita error si no hay cambios
+            result = subprocess.run(
+                ["git", "-C", str(repo), "commit", "-m", "Backup automático"],
+                check=False, capture_output=True, text=True
+            )
+            if "nothing to commit" in result.stdout.lower():
+                logging.info(f"No hay cambios en {repo.name}, se omite commit")
+            else:
+                logging.info(f"Commit realizado en {repo.name}")
                 subprocess.run(["git", "-C", str(repo), "push"], check=True)
                 logging.info(f"Backup GitHub realizado para {repo.name}")
                 actualizado.append(repo.name)
-            except subprocess.CalledProcessError as e:
-                logging.error(f"Error en repo {repo.name}: {e}")
-        else:
-            logging.warning(f"{repo} no es un repositorio Git")
+        except subprocess.CalledProcessError as e:
+            logging.error(f"Error en repo {repo.name}: {e}")
     return actualizado
 
 # ========================
@@ -88,8 +105,13 @@ def main():
         print(f"Archivos copiados a NAS: {resumen_nas}")
 
     if args.github:
-        resumen_github = backup_to_github()
-        print(f"Repositorios actualizados en GitHub: {resumen_github}")
+        repositorios_git = encontrar_repos_git(PROYECTOS_BASE)
+        if not repositorios_git:
+            print("No se encontraron repositorios Git en la carpeta base.")
+            logging.warning("No se encontraron repositorios Git en la carpeta base")
+        else:
+            resumen_github = backup_to_github(repositorios_git)
+            print(f"Repositorios actualizados en GitHub: {resumen_github}")
 
     if not args.nas and not args.github:
         print("No se especificó ningún destino. Usa --nas y/o --github")
