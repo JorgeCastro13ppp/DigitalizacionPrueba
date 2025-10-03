@@ -11,3 +11,9 @@
 2025-10-03 09:59:04,829 - INFO - Resumen NAS: []
 2025-10-03 09:59:04,829 - INFO - Resumen GitHub: []
 2025-10-03 10:00:34,983 - INFO - ===== INICIO DE COPIA DE SEGURIDAD =====
+2025-10-03 10:00:34,987 - INFO - Commit realizado en prueba
+2025-10-03 10:00:35,565 - ERROR - Error en repo prueba: Command '['git', '-C', '/home/diurno/Escritorio/DASP/prueba', 'push']' returned non-zero exit status 1.
+2025-10-03 10:00:35,565 - INFO - ===== FIN DE COPIA DE SEGURIDAD =====
+2025-10-03 10:00:35,566 - INFO - Resumen NAS: []
+2025-10-03 10:00:35,566 - INFO - Resumen GitHub: []
+2025-10-03 10:01:05,139 - INFO - ===== INICIO DE COPIA DE SEGURIDAD =====
