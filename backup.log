@@ -29,3 +29,9 @@
 2025-10-03 10:04:57,141 - INFO - Resumen NAS: []
 2025-10-03 10:04:57,141 - INFO - Resumen GitHub: ['prueba']
 2025-10-03 10:16:50,161 - INFO - ===== INICIO DE COPIA DE SEGURIDAD =====
+2025-10-03 10:16:50,212 - INFO - Commit realizado en prueba
+2025-10-03 10:16:52,177 - INFO - Backup GitHub realizado para prueba
+2025-10-03 10:16:52,177 - INFO - ===== FIN DE COPIA DE SEGURIDAD =====
+2025-10-03 10:16:52,177 - INFO - Resumen NAS: []
+2025-10-03 10:16:52,177 - INFO - Resumen GitHub: ['prueba']
+2025-10-03 10:22:17,752 - INFO - ===== INICIO DE COPIA DE SEGURIDAD =====

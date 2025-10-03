@@ -1,32 +1,52 @@
-# 🗄️ Script de Copias de Seguridad Automáticas
+# Script de Backup Automático – Jorge Leonardo Castro
 
-Este script en Python permite realizar copias de seguridad automáticas de proyectos de programación, tanto hacia **GitHub** como hacia una carpeta **NAS / red compartida**.  
+Este script permite realizar copias de seguridad de proyectos DAM hacia **GitHub** y/o un **NAS local**, con soporte de compresión (`.zip` o `.tar.gz`).
+
+---
 
 ## 🚀 Funcionalidades
-- Copia hacia **GitHub**: automatiza `git add`, `commit` y `push`.
-- Copia hacia **NAS** con compresión:
-  - Formatos soportados: `.zip`, `.tar`, `.gz`.
-- Logs automáticos en `backup.log`.
-- Configuración sencilla mediante argumentos en consola.
-- Puede ejecutarse de forma programada con `cron` (Linux) o Tareas Programadas (Windows).
+- **Backup hacia NAS** con compresión (`zip` o `tar.gz`).
+- **Backup hacia GitHub** realizando `git add`, `commit` y `push` automáticos.
+- Registro detallado de logs en `backup.log`.
+- Compatible con ejecución automática mediante **cron (Linux)** o **Tareas Programadas (Windows)**.
 
 ---
 
-## 📦 Requisitos previos
-- Python 3 instalado.
-- Git instalado y configurado.
-- Repositorios locales correctamente inicializados y vinculados a un remoto en GitHub.
-- Token personal de GitHub configurado en el `git remote` (si no usas SSH).
-- Acceso a la carpeta de destino en red/NAS.
+## ⚙️ Requisitos
+- Python 3
+- Git instalado y configurado
+- Acceso al repositorio GitHub mediante **token** en la URL remota
+- Carpeta montada del NAS en `/mnt/nas/backup_proyectos` (puede cambiarse en el script)
 
 ---
 
-## ⚙️ Uso
-Ejecutar desde terminal:
+## 📌 Uso
 
-### Backup hacia GitHub
+Ir a la carpeta donde está el script y ejecutar:
+
 ```bash
+python3 backupJorgeLeonardoCastro.py [opciones]
+
 python3 backupJorgeLeonardoCastro.py --github
+
+🕒 Automatización
+En Linux (cron):
+
+Editar tareas programadas con:
+
+crontab -e
+
+
+Ejemplo: ejecutar todos los días a las 23:00
+
+0 23 * * * /usr/bin/python3 /home/diurno/Escritorio/DASP/prueba/backupJorgeLeonardoCastro.py --nas --github --formato zip
+
+En Windows (Tareas Programadas):
+
+Crear una tarea nueva que ejecute:
+
+python.exe C:\ruta\al\script\backupJorgeLeonardoCastro.py --nas --github --formato zip
+
 
 ## Conversación con ChatGPT mediante enlace
 https://chatgpt.com/share/68df8630-1480-800a-9ac6-d3bcc854e36e
