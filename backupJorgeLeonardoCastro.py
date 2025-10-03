@@ -12,7 +12,7 @@ import argparse
 # CONFIGURACIÓN
 # ========================
 PROYECTOS_BASE = Path("/home/diurno/Escritorio/DASP")
-DESTINO_NAS = Path("/mnt/nas/backup_proyectos")  # Cambia según tu red
+DESTINO_NAS = Path("/mnt/nas/backup_proyectos")  # Cambia según tu red/NAS
 LOG_FILE = str(Path(__file__).parent / "backup.log")
 
 logging.basicConfig(filename=LOG_FILE, level=logging.INFO,
@@ -41,17 +41,19 @@ def zip_folder(folder_path, zip_path):
                 zipf.write(full_path, full_path.relative_to(folder_path))
     logging.info(f"Carpeta comprimida en {zip_path}")
 
-def tar_folder(folder_path, tar_path):
-    """Comprime en .tar.gz"""
-    with tarfile.open(tar_path, "w:gz") as tar:
+def tar_folder(folder_path, tar_path, modo="w"):
+    """Comprime en .tar o .gz según modo"""
+    with tarfile.open(tar_path, modo) as tar:
         tar.add(folder_path, arcname=folder_path.name)
     logging.info(f"Carpeta comprimida en {tar_path}")
 
 def backup_to_nas(formato="zip"):
     """Copia incremental hacia NAS con compresión"""
-    if not DESTINO_NAS.exists():
-        DESTINO_NAS.mkdir(parents=True)
-        logging.info(f"Se creó la carpeta destino: {DESTINO_NAS}")
+    try:
+        DESTINO_NAS.mkdir(parents=True, exist_ok=True)
+    except Exception as e:
+        logging.error(f"No se pudo crear la carpeta NAS: {e}")
+        return []
 
     resumen = []
     for proyecto in PROYECTOS_BASE.iterdir():
@@ -67,12 +69,20 @@ def backup_to_nas(formato="zip"):
                 zip_folder(proyecto, ruta)
 
             elif formato == "tar":
-                nombre = f"{proyecto.name}_{fecha}.tar.gz"
+                nombre = f"{proyecto.name}_{fecha}.tar"
                 ruta = DESTINO_NAS / nombre
                 if ruta.exists():
                     logging.info(f"{nombre} ya existe, se omite")
                     continue
-                tar_folder(proyecto, ruta)
+                tar_folder(proyecto, ruta, modo="w")
+
+            elif formato == ".gz":
+                nombre = f"{proyecto.name}_{fecha}.gz"
+                ruta = DESTINO_NAS / nombre
+                if ruta.exists():
+                    logging.info(f"{nombre} ya existe, se omite")
+                    continue
+                tar_folder(proyecto, ruta, modo="w:gz")
 
             resumen.append(nombre)
     return resumen
@@ -105,8 +115,8 @@ def main():
     parser = argparse.ArgumentParser(description="Backup automático proyectos DAM")
     parser.add_argument('--nas', action='store_true', help='Hacer copia hacia NAS')
     parser.add_argument('--github', action='store_true', help='Hacer backup hacia GitHub')
-    parser.add_argument('--formato', choices=['zip', 'tar'], default='zip',
-                        help='Formato de compresión para NAS (zip o tar)')
+    parser.add_argument('--formato', choices=['zip', 'tar', 'gz'], default='zip',
+                        help='Formato de compresión para NAS (zip, tar o gz)')
     args = parser.parse_args()
 
     logging.info("===== INICIO DE COPIA DE SEGURIDAD =====")

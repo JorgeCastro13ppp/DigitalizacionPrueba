@@ -1,0 +1,32 @@
+# 🗄️ Script de Copias de Seguridad Automáticas
+
+Este script en Python permite realizar copias de seguridad automáticas de proyectos de programación, tanto hacia **GitHub** como hacia una carpeta **NAS / red compartida**.  
+
+## 🚀 Funcionalidades
+- Copia hacia **GitHub**: automatiza `git add`, `commit` y `push`.
+- Copia hacia **NAS** con compresión:
+  - Formatos soportados: `.zip`, `.tar`, `.gz`.
+- Logs automáticos en `backup.log`.
+- Configuración sencilla mediante argumentos en consola.
+- Puede ejecutarse de forma programada con `cron` (Linux) o Tareas Programadas (Windows).
+
+---
+
+## 📦 Requisitos previos
+- Python 3 instalado.
+- Git instalado y configurado.
+- Repositorios locales correctamente inicializados y vinculados a un remoto en GitHub.
+- Token personal de GitHub configurado en el `git remote` (si no usas SSH).
+- Acceso a la carpeta de destino en red/NAS.
+
+---
+
+## ⚙️ Uso
+Ejecutar desde terminal:
+
+### Backup hacia GitHub
+```bash
+python3 backupJorgeLeonardoCastro.py --github
+
+## Conversación con ChatGPT mediante enlace
+https://chatgpt.com/share/68df8630-1480-800a-9ac6-d3bcc854e36e
